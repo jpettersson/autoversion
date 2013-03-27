@@ -1,0 +1,34 @@
+#!/usr/bin/env ruby
+require_relative '../lib/autoversion'
+require "thor"
+
+class AutoversionThor < Thor
+  desc 'read_version', 'Read the Semantic Version of the current project'
+  def read_version
+    puts "Reading the version.."
+  end
+
+  desc 'patch', "Increment a patch version"
+  def patch
+    puts 'Incrementing patch'
+  end
+
+  desc 'minor', 'Increment a minor version'
+  def minor
+    puts 'Incrementing minor'
+  end
+
+  desc 'release', 'Increment a release version'
+  def release
+    puts 'Incrementing release'
+  end
+
+  desc 'special', 'Incrementing a special version'
+  def special
+    puts 'Incrementing special'
+  end
+
+  default_task :read_version
+end
+
+AutoversionThor.start
