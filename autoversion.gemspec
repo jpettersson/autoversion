@@ -4,7 +4,7 @@ require "autoversion/version"
 
 Gem::Specification.new do |s|
   s.name        = 'autoversion'
-  s.version     = AirportEvents::VERSION
+  s.version     = Autoversion::VERSION
   s.date        = '2013-03-27'
   s.summary     = "Automate your Semantic Versioning with git and hooks"
   s.description = "Yeah"
@@ -17,4 +17,5 @@ Gem::Specification.new do |s|
 
   s.add_development_dependency "rspec", "2.13.0"
   s.add_runtime_dependency "thor", "0.17.0"
+  s.add_runtime_dependency "semantic", "1.1.0"
 end
