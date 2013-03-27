@@ -1,3 +1,3 @@
-module AutoVersion
+module Autoversion
 
 end
