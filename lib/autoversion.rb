@@ -1,0 +1,3 @@
+module AutoVersion
+
+end
