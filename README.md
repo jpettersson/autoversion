@@ -1,22 +1,22 @@
-Semantic Versioning
+Automate your Semantic Versioning
 ==================
 
 tasks
 -----
 
 Read current version
-* semver
+* autoversion
 
 These functions will refuse to run if the current git dir is 'dirty':
 
 Increment version
-* semver patch
-* semver minor
-* semver special 'named-version'
-* semver release
+* autoversion patch
+* autoversion minor
+* autoversion special 'named-version'
+* autoversion release
 
 Undo last version
-* semver rollback
+* autoversion rollback
 
 Versionfile
 
