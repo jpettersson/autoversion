@@ -54,4 +54,4 @@ Workflow
 --------
 * Git is automatically integrated and a new atomic commit and tag will be created for each version.
 * After a version has been created the script will run any 'after' hooks defined, and in the order they were defined in this file.
---
+
