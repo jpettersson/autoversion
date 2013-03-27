@@ -4,13 +4,24 @@ Semantic Versioning
 tasks
 -----
 
-semver minor +bump
-semver patch +bump
-semver release +bump
+Read current version
+* semver
+
+These functions will refuse to run if the current git dir is 'dirty':
+
+Increment version
+* semver patch
+* semver minor
+* semver special 'named-version'
+* semver release
+
+Undo last version
+* semver rollback
 
 Versionfile
 
 ```Ruby
+
 module Hooks
   def read_version
     # Return a valid Semantic object
@@ -21,7 +32,7 @@ module Hooks
   end
 end
 
-after :versioned do
+after :versione do
   # Run some command after any versioning action
 end
 
@@ -38,3 +49,10 @@ after :release do
 end
 
 ```
+
+Workflow
+--------
+Git is automatically integrated and a new atomic commit and tag will be created for each version.
+
+After a version has been created the script will run any 'after' hooks defined.
+--
