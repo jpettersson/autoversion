@@ -10,10 +10,10 @@ Read current version
 These functions will refuse to run if the current git dir is 'dirty':
 
 Increment version
-* autoversion patch
+* autoversion major
 * autoversion minor
-* autoversion special 'named-version'
-* autoversion release
+* autoversion patch
+* autoversion build 'named-version'
 
 Undo last version
 * autoversion rollback
@@ -60,4 +60,9 @@ Workflow
 Ideas
 -----
 * Automatically detect lib/gemname/version.rb
+
+Gitflow Integration
+-------------------
+Use a git hook to detect when a release branch is created
+
 
