@@ -22,9 +22,9 @@ Versionfile
 
 ```Ruby
 
-git do
-  auto_commit true
-  auto_tag
+automate :git do
+  commit true
+  tag true
 end
 
 # This block should return a valid Semantic object. Typically it will read a file and parse it.
