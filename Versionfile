@@ -1,0 +1,16 @@
+read_version do
+  file = File.read 'lib/autoversion/version.rb'
+end
+
+# This block should take a Semantic object and persist it. Usually this means rewriting some version file.
+write_version do |version|
+  File.write 'lib/autoversion/version.rb', <<-eos
+module Autoversion
+  VERSION = #{version.to_s}
+end
+  eos
+end
+
+after :major do
+  # Run some command after release
+end

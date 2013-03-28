@@ -34,6 +34,7 @@ end
 
 after :version do
   # Run some command after any versioning action
+  # Example: Export a .crx file, copy & name it for Blackberry
 end
 
 after :patch do
@@ -44,8 +45,9 @@ after :minor do
   # Run some command after minor
 end
 
-after :release do
+after :major do
   # Run some command after release
+  # Example: Copy lib/ files from Exo.js to exojs-gem
 end
 
 ```
@@ -54,4 +56,8 @@ Workflow
 --------
 * Git is automatically integrated and a new atomic commit and tag will be created for each version.
 * After a version has been created the script will run any 'after' hooks defined, and in the order they were defined in this file.
+
+Ideas
+-----
+* Automatically detect lib/gemname/version.rb
 
