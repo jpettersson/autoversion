@@ -2,34 +2,36 @@ module Autoversion
   class Versioner
 
     def initialize
-      @current = read_version
+      # Read the Versionfile
+      versionfileContents = File.read File.join(Dir.pwd, "Versionfile")
+
+      # Eval the Versionfile within the DSL
+      @read_blk, @write_blk, @listeners = Autoversion::DSL.evaluate versionfileContents
+      
+      # Fetch current version?
+      @current = read_version if @read_blk
     end
 
-    def increment_patch
-
+    def current_version
+      @current
     end
 
-    def increment_minor
-
+    def next_version type
+      @current.increment(type)
     end
 
-    def increment_major
-
+    def increment! type
+      nextVersion = @current.increment(type)
+      write_version @current, nextVersion
+      @current = nextVersion
     end
-
-    def roll_back
-      # Roll back to the previous version
-      # Need a record of changes?
-    end
-
-    private 
 
     def read_version
-      # Read version from Versionfile block
+      Autoversion::SemVer.new @read_blk.call
     end
 
-    def write_version semantic
-      # Write version using Versionfile block
+    def write_version currentVersion, nextVersion
+      @write_blk.call currentVersion, nextVersion
     end
 
   end
