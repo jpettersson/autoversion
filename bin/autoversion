@@ -3,29 +3,48 @@ require_relative '../lib/autoversion'
 require "thor"
 
 class AutoversionThor < Thor
+  include Thor::Actions
+
+  def initialize(*args)
+    super *args
+    @versioner = Autoversion::Versioner.new
+  end
+
   desc 'read_version', 'Read the Semantic Version of the current project'
   def read_version
-    puts "Reading the version.."
+    say @versioner.current_version.to_s, :cyan
   end
 
   desc 'patch', "Increment a patch version"
   def patch
-    puts 'Incrementing patch'
+    increment_version :patch
   end
 
   desc 'minor', 'Increment a minor version'
   def minor
-    puts 'Incrementing minor'
+    increment_version :minor
   end
 
-  desc 'release', 'Increment a release version'
-  def release
-    puts 'Incrementing release'
+  desc 'major', 'Increment a major version'
+  def major
+    increment_version :major
   end
 
-  desc 'special', 'Incrementing a special version'
+  #TODO: Accept arg
+  desc 'build', 'Create a build version'
   def special
-    puts 'Incrementing special'
+    create_build_version
+  end
+
+  no_tasks do
+    def increment_version type
+      if yes? "Do you want to increment #{type.to_s} to #{@versioner.next_version(type)}? (y/N)"
+        @versioner.increment! type
+        say "Version changed to #{@versioner.current_version}", :green
+      else
+        say "No changes were made."
+      end
+    end
   end
 
   default_task :read_version
