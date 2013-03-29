@@ -22,6 +22,11 @@ Versionfile
 
 ```Ruby
 
+automate :git do
+  commit true
+  tag true
+end
+
 # This block should return a valid Semantic object. Typically it will read a file and parse it.
 read_version do
   # Return a valid Semantic object
