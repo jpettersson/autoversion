@@ -16,18 +16,21 @@ class AutoversionThor < Thor
   end
 
   desc 'patch', "Increment a patch version"
+  method_option :simulate, :type => :boolean, :aliases => "-s"
   def patch
-    increment_version :patch
+    increment_version :patch, options[:simulate]
   end
 
   desc 'minor', 'Increment a minor version'
+  method_option :simulate, :type => :boolean, :aliases => "-s"
   def minor
-    increment_version :minor
+    increment_version :minor, options[:simulate]
   end
 
   desc 'major', 'Increment a major version'
+  method_option :simulate, :type => :boolean, :aliases => "-s"
   def major
-    increment_version :major
+    increment_version :major, options[:simulate]
   end
 
   #TODO: Accept arg
@@ -37,10 +40,11 @@ class AutoversionThor < Thor
   end
 
   no_tasks do
-    def increment_version type
+    def increment_version type, simulate=false
       if yes? "Do you want to increment #{type.to_s} to #{@versioner.next_version(type)}? (y/N)"
-        @versioner.increment! type
-        say "Version changed to #{@versioner.current_version}", :green
+        outcome = simulate ? "would change" : "changed"
+        @versioner.increment! type, simulate
+        say "Version #{outcome} to #{@versioner.current_version}", simulate ? :cyan : :green
       else
         say "No changes were made."
       end
