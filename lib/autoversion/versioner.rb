@@ -8,7 +8,7 @@ module Autoversion
       # Fetch current version?
       @current = read_version if @read_blk
 
-      @git_enabled = true
+      @git_enabled = false
       @gitter = ::Autoversion::Gitter.new(Dir.pwd)
     end
 
