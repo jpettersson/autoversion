@@ -1,17 +1,15 @@
 module Autoversion
   class Versioner
 
-    def initialize
-      @simulate = true
-
-      # Read the Versionfile
-      versionfileContents = File.read File.join(Dir.pwd, "Versionfile")
-
+    def initialize versionfileContents
       # Eval the Versionfile within the DSL
       @read_blk, @write_blk, @listeners = Autoversion::DSL.evaluate versionfileContents
       
       # Fetch current version?
       @current = read_version if @read_blk
+
+      @git_enabled = true
+      @gitter = ::Autoversion::Gitter.new(Dir.pwd)
     end
 
     def current_version
