@@ -20,13 +20,15 @@ module Autoversion
       @current.increment(type)
     end
 
-    def increment! type, simulate
+    def increment! type, simulate=false
       nextVersion = @current.increment(type)
 
       process_before type, @current, nextVersion
-      write_version @current, nextVersion unless simulate
-
-      @current = nextVersion
+      unless simulate
+        write_version @current, nextVersion 
+        @current = nextVersion
+        @gitter.commit! type, @current.to_s if @git_enabled
+      end
 
       process_after type, @current
     end
