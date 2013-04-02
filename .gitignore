@@ -1,4 +1,3 @@
 .DS_Store
-spec/tmp/gitter
-spec/tmp/cli
+spec/tmp/*
 *.gem
