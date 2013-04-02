@@ -1,3 +1,5 @@
+automate_git
+
 read_version do
   contents = File.read File.join(Dir.pwd, "lib/autoversion/version.rb")
   instance_eval(contents)
