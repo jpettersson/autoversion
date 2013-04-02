@@ -3,14 +3,23 @@ require 'git'
 module Autoversion
   class Gitter
 
-    # class DIRTY_STAGING < Exception end
-    # class NOT_ON_STABLE_BRANCH < Exception end
+    class DirtyStaging < Exception 
+    end
+    
+    class NotOnStableBranch < Exception 
+    end
 
-    def initialize path, config={}
+    def initialize path, config
       @path = path
-      @stable_branch = config[:stable] || :master
+      @config = config
 
       @repo = Git.open(path)
+    end
+
+    def ensure_cleanliness! 
+      if @config[:actions].include?(:commit)
+        raise DirtyStaging unless dir_is_clean?
+      end
     end
 
     def dir_is_clean?
@@ -18,28 +27,26 @@ module Autoversion
     end
 
     def on_stable_branch?
-      @repo.current_branch == @stable_branch.to_s
+      @repo.current_branch == @config[:stable_branch].to_s
     end
 
     def commit! versionType, currentVersion
-      # raise DIRTY_STAGING.new unless dir_is_clean?
+      return false unless @config[:actions].include?(:commit)
+      raise NotOnStableBranch if versionType == :major && !on_stable_branch?
 
-      # if versionType == :major
-      #   raise NOT_ON_STABLE_BRANCH.new unless on_stable_branch?
-      # end
-
-      commit_version
-      tag_version
+      write_commit currentVersion
+      write_tag currentVersion if @config[:actions].include?(:tag)
     end
 
     private
 
-    def commit_version
-
+    def write_commit version
+      @repo.add '.'
+      @repo.commit "#{@config[:prefix]}#{version}"
     end
 
-    def tag_version
-
+    def write_tag version
+      @repo.add_tag "#{@config[:prefix]}#{version}"
     end
 
   end

@@ -1,15 +1,19 @@
 module Autoversion
   class Versioner
 
+    class UnableToReadVersion < Exception 
+    end
+
     def initialize versionfileContents
       # Eval the Versionfile within the DSL
-      @read_blk, @write_blk, @listeners = Autoversion::DSL.evaluate versionfileContents
+      @read_blk, @write_blk, @listeners, @config = Autoversion::DSL.evaluate versionfileContents
       
-      # Fetch current version?
+      raise UnableToReadVersion unless @read_blk
+
+      # Fetch current version
       @current = read_version if @read_blk
 
-      @git_enabled = false
-      @gitter = ::Autoversion::Gitter.new(Dir.pwd)
+      @gitter = ::Autoversion::Gitter.new(Dir.pwd, @config[:git])
     end
 
     def current_version
@@ -21,13 +25,15 @@ module Autoversion
     end
 
     def increment! type, simulate=false
+      @gitter.ensure_cleanliness!
+
       nextVersion = @current.increment(type)
 
       process_before type, @current, nextVersion
       unless simulate
         write_version @current, nextVersion 
         @current = nextVersion
-        @gitter.commit! type, @current.to_s if @git_enabled
+        @gitter.commit! type, @current.to_s
       end
 
       process_after type, @current
