@@ -47,10 +47,10 @@ describe Autoversion::Gitter do
     #Fake version file
     system("touch #{@path}/version.rb")
 
-    @gitter.commit! :major, '1.2.3'
+    @gitter.commit! :major, 'v1.2.3'
 
-    @repo.log.first.message.should == "1.2.3"
-    @repo.tags.first.name.should == "1.2.3"
+    @repo.log.first.message.should == "v1.2.3"
+    @repo.tags.first.name.should == "v1.2.3"
   end
 
 end
