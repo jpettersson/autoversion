@@ -22,15 +22,18 @@ module Autoversion
     end
 
     def dir_is_clean?
-      sum = @repo.status.untracked.length + @repo.status.added.length + @repo.status.changed.length + @repo.status.deleted.length
-      if sum > 0
-        puts "untracked: #{@repo.status.untracked}"
-        puts "added: #{@repo.status.added}"
-        puts "changed: #{@repo.status.changed}"
-        puts "deleted: #{@repo.status.deleted}"
-      end
-      
-      sum == 0
+      # sum = @repo.status.untracked.length + @repo.status.added.length + @repo.status.changed.length + @repo.status.deleted.length
+      # if sum > 0
+      #   puts "untracked: #{@repo.status.untracked}"
+      #   puts "added: #{@repo.status.added}"
+      #   puts "changed: #{@repo.status.changed}"
+      #   puts "deleted: #{@repo.status.deleted}"
+      # end
+
+      # sum == 0
+
+      # Disabled for now. ruby-git doesn't seem to read the .gitignore files, so the untracked count is completely useless. 
+      true
     end
 
     def on_stable_branch?
