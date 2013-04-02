@@ -1,31 +1,32 @@
-Automate your Semantic Versioning
-==================
+Autoversion
+===========
 
-tasks
------
+Autoversion is a command line tool that can help you automate aspects around your [semantic versioning](http://semver.org).
 
-Read current version
-* autoversion
+Basics
+---------
 
-These functions will refuse to run if the current git dir is 'dirty':
+**Read current version**
+```Bash
+$ autoversion
+```
 
-Increment version
-* autoversion major
-* autoversion minor
-* autoversion patch
-* autoversion build 'named-version'
+**Increment versions**
+```Bash
+$ autoversion major
+$ autoversion minor
+$ autoversion patch
+$ autoversion build 'named-version'
+```
 
-Undo last version
-* autoversion rollback
+The Versionfile
+--------------------
 
-Versionfile
+The Versionfile is a ruby script which is used by Autoversion to read and write version.
+
+**Example**
 
 ```Ruby
-
-automate_git 
-  :actions => [:commit, :tag], 
-  :prefix => 'v', 
-  :stable_branch => 'master'
 
 # This block should return a valid Semantic object. Typically it will read a file and parse it.
 read_version do
@@ -57,17 +58,5 @@ end
 
 ```
 
-Workflow
---------
-* Git is automatically integrated and a new atomic commit and tag will be created for each version.
-* After a version has been created the script will run any 'after' hooks defined, and in the order they were defined in this file.
-
-Ideas
------
-* Automatically detect lib/gemname/version.rb
-
-Gitflow Integration
--------------------
-Use a git hook to detect when a release branch is created
 
 
