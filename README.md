@@ -22,7 +22,10 @@ Versionfile
 
 ```Ruby
 
-automate_git, :actions => [:commit, :tag], :prefix => 'v', :stable_branch => 'master'
+automate_git 
+  :actions => [:commit, :tag], 
+  :prefix => 'v', 
+  :stable_branch => 'master'
 
 # This block should return a valid Semantic object. Typically it will read a file and parse it.
 read_version do
