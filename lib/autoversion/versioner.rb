@@ -4,7 +4,7 @@ module Autoversion
     class UnableToReadVersion < Exception 
     end
 
-    def initialize versionfileContents
+    def initialize versionfileContents, pwd=nil
       # Eval the Versionfile within the DSL
       @read_blk, @write_blk, @listeners, @config = Autoversion::DSL.evaluate versionfileContents
       
@@ -13,7 +13,7 @@ module Autoversion
       # Fetch current version
       @current = read_version if @read_blk
 
-      @gitter = ::Autoversion::Gitter.new(Dir.pwd, @config[:git])
+      @gitter = ::Autoversion::Gitter.new(pwd || Dir.pwd, @config[:git])
     end
 
     def current_version

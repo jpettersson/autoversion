@@ -12,11 +12,10 @@ module Autoversion
     def initialize path, config
       @path = path
       @config = config
-
       @repo = Git.open(path)
     end
 
-    def ensure_cleanliness! 
+    def ensure_cleanliness!
       if @config[:actions].include?(:commit)
         raise DirtyStaging unless dir_is_clean?
       end

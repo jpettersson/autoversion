@@ -6,12 +6,13 @@ module Autoversion
 
     class << self
       attr_accessor :version_file_contents
+      attr_accessor :pwd
     end
     
     def initialize(*args)
       super *args
       version_file_contents = CLI::version_file_contents || File.read(File.join(Dir.pwd, "Versionfile"))
-      @versioner = Autoversion::Versioner.new version_file_contents
+      @versioner = Autoversion::Versioner.new version_file_contents, CLI::pwd
     end
 
     desc 'read_version', 'Read the Semantic Version of the current project'
