@@ -3,7 +3,9 @@ Autoversion
 
 Autoversion is a command line tool that can automate [semantic versioning](http://semver.org) in your application. It 
 integrates nicely with git to give you automatic & atomic commits of version increments. It also supports hooks that can be run before and after a new version has been comitted.
-Autoversion is not finished, but it's used enough to be public. Consider it an experiment. And yes, Autoversion uses Autoversion for versioning ;)
+
+Autoversion is not finished, but it's used enough to be public. Consider it an experiment.<br />
+And yes, Autoversion uses Autoversion for versioning ;)
 
 Basics
 ---------
