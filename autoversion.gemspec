@@ -10,10 +10,11 @@ Gem::Specification.new do |s|
   s.description = "Yeah"
   s.authors     = ["Jonathan Pettersson"]
   s.email       = 'jonathan@spacetofu.com'
-  s.files         = `git ls-files`.split("\n")
-  s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
+  s.files       = `git ls-files`.split("\n")
+  s.test_files  = `git ls-files -- {test,spec,features}/*`.split("\n")
   s.homepage    = 'https://github.com/jpettersson/autoversion'
   s.executables << 'autoversion'
+  s.license    = 'MIT'
 
   s.add_development_dependency "rspec", "2.13.0"
   s.add_runtime_dependency "thor", "0.17.0"
