@@ -18,6 +18,6 @@ Gem::Specification.new do |s|
 
   s.add_development_dependency "rspec", "2.13.0"
   s.add_runtime_dependency "thor", "0.17.0"
-  s.add_runtime_dependency "git"
+  s.add_runtime_dependency "git", "1.2.5"
   s.add_runtime_dependency "semantic", "1.1.0"
 end
