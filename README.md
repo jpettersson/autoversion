@@ -7,6 +7,12 @@ integrates nicely with git to give you automatic & atomic commits of version inc
 Autoversion is not finished, but it's used enough to be public. Consider it an experiment.<br />
 And yes, Autoversion uses Autoversion for versioning ;)
 
+Installation
+------------
+```
+gem install autoversion
+```
+
 Usage
 -----
 
