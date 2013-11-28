@@ -7,8 +7,8 @@ integrates nicely with git to give you automatic & atomic commits of version inc
 Autoversion is not finished, but it's used enough to be public. Consider it an experiment.<br />
 And yes, Autoversion uses Autoversion for versioning ;)
 
-Basics
----------
+Usage
+-----
 
 **Read current version**
 ```Bash
@@ -20,13 +20,12 @@ $ autoversion
 $ autoversion major
 $ autoversion minor
 $ autoversion patch
-$ autoversion build 'named-version'
 ```
 
 The Versionfile
 --------------------
 
-The Versionfile is a ruby script which is used by Autoversion to read and write version.
+The project you want to version needs to have a file called 'Versionfile'. Autoversion will evaluate this file as a ruby script. Autoversion provides a small DSL to allow you to read and write versions to your files. Below is an example of the DSL usage:
 
 **Example**
 
@@ -34,17 +33,17 @@ The Versionfile is a ruby script which is used by Autoversion to read and write 
 
 # This block should return a valid Semantic object. Typically it will read a file and parse it.
 read_version do
-  # Return a valid Semantic object
+  # Should return a string representation of a semantic version
 end
 
-# This block should take a Semantic object and persist it. Usually this means rewriting some version file.
-write_version do |semver|
-  # Write a Semantic object
+# This block takes the current and next version (strings). Usually this means rewriting some version file.
+write_version do |currentVersion, nextVersion|
+  # Write the new version to a file
 end
 
 after :version do
   # Run some command after any versioning action
-  # Example: Export a .crx file, copy & name it for Blackberry
+  # Example: Run a package script, trigger CI, etc.
 end
 
 after :patch do
@@ -57,7 +56,6 @@ end
 
 after :major do
   # Run some command after release
-  # Example: Copy lib/ files from Exo.js to exojs-gem
 end
 
 ```
@@ -117,9 +115,27 @@ after :version do |currentVersion|
 end
 ```
 
-**An npm module**
+**A bower module**
 
 ```Ruby
+require 'json'
+
+# Automatically create an atomic commit of the version file update
+# and create a new tag.
+automate_git :actions => [:commit, :tag]
+
+file = './bower.json'
+
+read_version do
+  doc = JSON.load File.read file
+  doc['version']
+end
+
+write_version do |currentVersion, nextVersion|
+  doc = JSON.load File.read file
+  doc['version'] = nextVersion.to_s
+  File.open(file, 'w') {|f| f.write JSON.pretty_generate(doc) }
+end
 ```
 
 
