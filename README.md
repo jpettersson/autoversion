@@ -68,39 +68,6 @@ end
 
 ```
 
-**Advanced usage: Update several files using a pattern matcher**
-
-You can also read & update versions using a pattern matcher. The following Versionfile is from a ruby gem that has several plugins (also packaged as gems) contained in the same git repo. The VERSION_PATTERN is used for both reading and writing the version. Note that the write_version method updates several files using a glob pattern.
-
-```Ruby
-
-# The matched files look like this:
-
-# module YourProject
-#  VERSION = "0.0.2"
-# end
-
-VERSION_PATTERN = /^\s*VERSION = \"(.+)\"$/
-
-matcher = proc do |line|
-  if m = VERSION_PATTERN.match(line)
-    m[1]
-  else
-    nil
-  end
-end
-
-read_version do
-  parse_file "lib/your-project/version.rb", matcher
-end
-
-write_version do |oldVersion, newVersion|
-  update_files Dir.glob("**/version.rb"), matcher, oldVersion, newVersion
-end
-
-```
-
-
 Versionfile Examples
 ----------------------------
 
@@ -177,6 +144,38 @@ write_version do |currentVersion, nextVersion|
   doc['version'] = nextVersion.to_s
   File.open(file, 'w') {|f| f.write JSON.pretty_generate(doc) }
 end
+```
+
+**Advanced usage: Update several files using a pattern matcher**
+
+You can also read & update versions using a pattern matcher. The following Versionfile is from a ruby gem that has several plugins (also packaged as gems) contained in the same git repo. The VERSION_PATTERN is used for both reading and writing the version. Note that the write_version method updates several files using a glob pattern.
+
+```Ruby
+
+# The matched files look like this:
+
+# module YourProject
+#  VERSION = "0.0.2"
+# end
+
+VERSION_PATTERN = /^\s*VERSION = \"(.+)\"$/
+
+matcher = proc do |line|
+  if m = VERSION_PATTERN.match(line)
+    m[1]
+  else
+    nil
+  end
+end
+
+read_version do
+  parse_file "lib/your-project/version.rb", matcher
+end
+
+write_version do |oldVersion, newVersion|
+  update_files Dir.glob("**/version.rb"), matcher, oldVersion, newVersion
+end
+
 ```
 
 
