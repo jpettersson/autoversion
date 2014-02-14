@@ -37,12 +37,14 @@ The project you want to version needs to have a file called 'Versionfile'. Autov
 
 ```Ruby
 
-# This block should return a valid Semantic object. Typically it will read a file and parse it.
+# This block should return a valid Semantic object. 
+# Example: Read a file and parse a verson from it.
 read_version do
   # Should return a string representation of a semantic version
 end
 
-# This block takes the current and next version (strings). Usually this means rewriting some version file.
+# This block takes the current and next version (strings). 
+# Example: Rewriting a version file.
 write_version do |currentVersion, nextVersion|
   # Write the new version to a file
 end
