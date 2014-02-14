@@ -4,11 +4,10 @@
 Autoversion
 ===========
 
-Autoversion is a command line tool that can automate [semantic versioning](http://semver.org) in your application. It 
-integrates nicely with git to give you automatic & atomic commits of version increments. It also supports hooks that can be run before and after a new version has been comitted.
+Autoversion is a command line tool that can automate [semantic versioning](http://semver.org) during development. It 
+integrates nicely with git to give you automatic & atomic commits of version increments. Don't trust humans (not even yourself) to commit and tag proper versions, let autoversion do it for you.
 
-Autoversion is not finished, but it's used enough to be public. Consider it an experiment.<br />
-And yes, Autoversion uses Autoversion for versioning ;)
+Autoversion is great for library development where proper version management is important. Also, Autoversion uses Autoversion for versioning ;)
 
 Installation
 ------------
@@ -35,8 +34,6 @@ The Versionfile
 --------------------
 
 The project you want to version needs to have a file called 'Versionfile'. Autoversion will evaluate this file as a ruby script. Autoversion provides a small DSL to allow you to read and write versions to your files. Below is an example of the DSL usage:
-
-**Example**
 
 ```Ruby
 
@@ -69,11 +66,9 @@ end
 
 ```
 
-**Update several files using a pattern matcher**
+**Advanced usage: Update several files using a pattern matcher**
 
-This example shows how to read & update versions using a pattern matcher. The following Versionfile is from a ruby gem that has several plugins (also packaged as gems) contained in the same git repo. The VERSION_PATTERN is used for both reading and writing the version. Note that the write_version method updates several files using a glob pattern.
-
-Example file:
+You can also read & update versions using a pattern matcher. The following Versionfile is from a ruby gem that has several plugins (also packaged as gems) contained in the same git repo. The VERSION_PATTERN is used for both reading and writing the version. Note that the write_version method updates several files using a glob pattern.
 
 ```Ruby
 
@@ -97,8 +92,8 @@ read_version do
   parse_file "lib/your-project/version.rb", matcher
 end
 
-write_version do |old, new|
-  update_files Dir.glob("**/version.rb"), matcher, old, new
+write_version do |oldVersion, newVersion|
+  update_files Dir.glob("**/version.rb"), matcher, oldVersion, newVersion
 end
 
 ```
