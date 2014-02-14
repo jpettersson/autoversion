@@ -1,3 +1,6 @@
+### Status
+[![Build Status](https://travis-ci.org/jpettersson/autoversion.png)](https://travis-ci.org/jpettersson/autoversion)
+
 Autoversion
 ===========
 
