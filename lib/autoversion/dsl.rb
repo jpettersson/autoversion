@@ -1,6 +1,5 @@
 module Autoversion
   class DSL
-
     class MissingReadBlock < Exception
     end
 
@@ -23,6 +22,52 @@ module Autoversion
           :stable_branch => 'master'
         }
       }
+    end
+
+    # Parse the specified file with the provided matcher.
+    #
+    # The first returned match will be used as the version.
+    def parse_file path, matcher
+      File.open(path) do |f|
+        f.each do |line|
+          if m = matcher.call(line)
+            return m
+          end
+        end
+      end
+
+      raise "#{path}: found no matching lines."
+    end
+
+    # Update a file naively matching the specified matcher and replace any
+    # matching lines with the new version.
+    def update_file path, matcher, currentVersion, nextVersion
+      temp_path = "#{path}.autoversion"
+
+      begin
+        File.open(path) do |source|
+          File.open(temp_path, 'w') do |target|
+            source.each do |line|
+              if matcher.call(line)
+                target.write line.gsub currentVersion.to_s, nextVersion.to_s
+              else
+                target.write line
+              end
+            end
+          end
+        end
+
+        File.rename temp_path, path
+      ensure
+        File.unlink temp_path if File.file? temp_path
+      end
+    end
+
+    # Convenience function for update_file to apply to multiple files.
+    def update_files paths, matcher, currentVersion, nextVersion
+      paths.each do |path|
+        update_file path, matcher, currentVersion, nextVersion
+      end
     end
 
     def validate!
