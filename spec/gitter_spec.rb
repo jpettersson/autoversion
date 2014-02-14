@@ -13,6 +13,11 @@ describe Autoversion::Gitter do
     system("mkdir #{@gitter_path}")
     system("tar -xf spec/fixtures/bare_repo.tar --strip 1 -C #{@gitter_path}")
     
+    # Fix to make specs run on travis-ci which has no
+    # default git user config.
+    # system("cd #{@gitter_path} && git config user.email 'you@example.com'")
+    # system("cd #{@gitter_path} && git config user.name 'Your Name'")
+
     system("echo 'test' > #{@gitter_path}/test.txt")
     system("cd #{@gitter_path} && git add .")
     system("cd #{@gitter_path} && git commit -m 'test'")
