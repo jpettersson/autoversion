@@ -11,9 +11,7 @@ Autoversion is great for library development where proper version management is 
 
 Installation
 ------------
-```
-gem install autoversion
-```
+``gem install autoversion``
 
 Usage
 -----
