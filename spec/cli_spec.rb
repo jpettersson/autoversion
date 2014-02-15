@@ -1,19 +1,8 @@
 require 'spec_helper'
 require 'git'
+require_relative 'fixtures/versionfiles'
 
 describe Autoversion::CLI do
-
-  BASE_VERSIONFILE = <<-eos
-      read_version do
-        File.read File.join(File.dirname(__FILE__), 'spec', 'tmp', 'cli', 'version.txt')
-      end
-
-      write_version do |currentVersion, nextVersion|
-        File.open(File.join(File.dirname(__FILE__), 'spec', 'tmp', 'cli', 'version.txt'), 'w') do |file| 
-          file.write currentVersion.to_s
-        end
-      end
-    eos
 
   # Borrowing capture_io from minitest until I have 
   # time to move over to minitest fully.
@@ -57,14 +46,14 @@ describe Autoversion::CLI do
   end
 
   it "should be able to read a version" do
-    ::Autoversion::CLI.version_file_contents = BASE_VERSIONFILE
+    ::Autoversion::CLI.version_file_contents = Versionfiles::BASE_VERSIONFILE
 
     out = capture_io{ Autoversion::CLI.start %w{} }.join ''
     out.should == "\e[36m0.0.1\e[0m\n"
   end
 
   it "should be able to write versions" do
-    ::Autoversion::CLI.version_file_contents = BASE_VERSIONFILE
+    ::Autoversion::CLI.version_file_contents = Versionfiles::BASE_VERSIONFILE
 
     out = capture_io{ Autoversion::CLI.start %w{patch -f} }.join ''
     out.should == "\e[32mVersion changed to 0.0.2\e[0m\n"
@@ -76,22 +65,37 @@ describe Autoversion::CLI do
     out.should == "\e[32mVersion changed to 1.0.0\e[0m\n"
   end
 
+  it "should be able to read/write versions using a pattern matcher" do
+    ::Autoversion::CLI.version_file_contents = Versionfiles::PATTERN_VERSIONFILE
+    out = capture_io{ Autoversion::CLI.start %w{patch -f} }.join ''
+    out.should == "\e[32mVersion changed to 0.0.2\e[0m\n"
+
+    plugin_file = `cd #{@path} && cat lib/your-project/plugins/your-plugin/version.rb`
+    ref_file = <<-eof
+module YourProject
+ VERSION = "0.0.2"
+end
+eof
+
+    plugin_file.should == ref_file.chop
+  end
+
   it "should be able to write, commit and tag patch" do
-    ::Autoversion::CLI.version_file_contents = "automate_git\n\n" + BASE_VERSIONFILE
+    ::Autoversion::CLI.version_file_contents = "automate_git\n\n" + Versionfiles::BASE_VERSIONFILE
     
     out = capture_io{ Autoversion::CLI.start %w{patch -f} }.join ''
     out.should == "\e[32mVersion changed to 0.0.2\e[0m\n"
   end
 
   it "should be able to write, commit and tag minor" do
-    ::Autoversion::CLI.version_file_contents = "automate_git\n\n" + BASE_VERSIONFILE
+    ::Autoversion::CLI.version_file_contents = "automate_git\n\n" + Versionfiles::BASE_VERSIONFILE
 
     out = capture_io{ Autoversion::CLI.start %w{minor -f} }.join ''
     out.should == "\e[32mVersion changed to 0.1.0\e[0m\n"
   end
 
   it "should be able to write, commit and tag major" do
-    ::Autoversion::CLI.version_file_contents = "automate_git\n\n" + BASE_VERSIONFILE
+    ::Autoversion::CLI.version_file_contents = "automate_git\n\n" + Versionfiles::BASE_VERSIONFILE
 
     out = capture_io{ Autoversion::CLI.start %w{major -f} }.join ''
     out.should == "\e[32mVersion changed to 1.0.0\e[0m\n"
