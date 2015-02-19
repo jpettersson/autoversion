@@ -3,63 +3,121 @@ require 'git'
 
 describe Autoversion::Gitter do
 
-  before(:each) do
-    @gitter_path = File.join(File.dirname(__FILE__), 'tmp', 'gitter')
+  before { Git.stub(:open).with(gitter_path).and_return(repo) }
 
-    if File.directory? @gitter_path
-      FileUtils.rm_rf @gitter_path
+  let(:repo) { double() }
+
+  let(:gitter_path) { File.join(File.dirname(__FILE__), 'tmp', 'gitter') }
+  let(:stable_branch) { 'master' }
+
+  subject(:gitter) do
+    ::Autoversion::Gitter.new(gitter_path, {
+      :actions => [:commit],
+      :stable_branch => stable_branch})
+  end
+
+  shared_context 'when on "whatever" branch' do
+    before do
+      repo.stub(:current_branch).and_return('whatever')
+    end
+  end
+
+  shared_context 'when on stable branch' do
+    before do
+      repo.stub(:current_branch).and_return(stable_branch)
+    end
+  end
+
+  describe '#ensure_cleanliness!' do
+    context 'when config actions include "commit" && #dir_is_clean? is false' do
+      before do
+        gitter.stub(:dir_is_clean?).and_return(false)        
+      end
+      it 'raises a DirtyStaging Exception' do
+        expect { gitter.ensure_cleanliness! }.to(
+          raise_error ::Autoversion::Gitter::DirtyStaging)
+      end
+    end
+  end
+
+  describe '#dir_is_clean?' do
+    # Disabled for now since ruby-git does not read .gitignore files  
+    it 'returns true' do
+      expect(gitter.dir_is_clean?).to be_true
+    end
+  end
+
+  describe '#on_stable_branch?' do
+    context 'when the config stable branch differs with the current branch' do
+      include_context 'when on "whatever" branch'
+
+      it 'returns false' do
+        expect(gitter.on_stable_branch?).to be_false
+      end
     end
 
-    system("mkdir #{@gitter_path}")
-    system("tar -xf spec/fixtures/bare_repo.tar --strip 1 -C #{@gitter_path}")
-    
-    # Fix to make specs run on travis-ci which has no
-    # default git user config.
-    # system("cd #{@gitter_path} && git config user.email 'you@example.com'")
-    # system("cd #{@gitter_path} && git config user.name 'Your Name'")
+    context 'when the config stable branch equals the current branch' do
+      include_context 'when on stable branch'
 
-    system("echo 'test' > #{@gitter_path}/test.txt")
-    system("cd #{@gitter_path} && git add .")
-    system("cd #{@gitter_path} && git commit -m 'test'")
-
-    @gitter_repo = Git.open(@gitter_path)
+      it 'returns true' do
+        expect(gitter.on_stable_branch?).to be_true
+      end
+    end
   end
 
-  it 'should detect stable branch' do
-    @gitter = ::Autoversion::Gitter.new(@gitter_path, {
-      :stable_branch => 'master'})
+  describe '#commit!' do
+    let(:version) { 'v1.2.3' }
+    let(:invoke) { gitter.commit! :major, version }
 
-    @gitter_repo.branch('feature1').checkout
-    @gitter_repo.branch('feature2').checkout
-    @gitter.on_stable_branch?.should eq(false)
+    context 'when cannot commit' do
+      context 'when config actions do not include "commit"' do
+        subject(:gitter) do
+          ::Autoversion::Gitter.new(gitter_path, {
+            :actions => [],
+            :stable_branch => stable_branch})
+        end
 
-    @gitter_repo.branch('master').checkout
-    @gitter.on_stable_branch?.should eq(true)
-  end
+        it 'returns false' do
+          expect(invoke).to be_false
+        end
+      end
 
-  it 'should be able to commit and tag a new version' do
-    @gitter = ::Autoversion::Gitter.new(@gitter_path, {
-      :actions => [:commit, :tag], 
-      :stable_branch => 'master'})
+      context 'when versionType == :major && #on_stable_branch? == false' do
+        include_context 'when on "whatever" branch'
 
-    #Fake version file
-    system("touch #{@gitter_path}/version.rb")
+        it 'raises NotOnStableBranch Exception' do
+          expect { invoke }.to(
+            raise_error ::Autoversion::Gitter::NotOnStableBranch)
+        end
+      end
+    end #context cannot commit
 
-    @gitter.commit! :major, 'v1.2.3'
+    context 'when can commit' do
+      include_context 'when on stable branch'
 
-    @gitter_repo.log.first.message.should == "v1.2.3"
-    @gitter_repo.tags.first.name.should == "v1.2.3"
-  end
+      before do
+        repo.should_receive(:add).with('.').ordered
+        repo.should_receive(:commit).with(version).ordered
+      end
 
-  it 'should should detect cleanliness' do
-    @gitter = ::Autoversion::Gitter.new(@gitter_path, {
-      :stable_branch => 'master'})
+      it 'calls #add and #commit on the repo (Git) object' do
+        invoke
+      end
 
-    @gitter.dir_is_clean?.should eq(true)
-    
-    # Disabled for now since ruby-git does not read .gitignore files
-    #system("touch #{@gitter_path}/test2.txt")
-    #@gitter.dir_is_clean?.should eq(false)
-  end
+      context 'when config actions include "tag"' do
+        subject(:gitter) do
+          ::Autoversion::Gitter.new(gitter_path, {
+            :actions => [:commit, :tag],
+            :stable_branch => stable_branch})
+        end
+
+        it 'also calls #add_tag on the repo (Git) object' do
+          repo.should_receive(:add_tag).with(version).ordered
+          invoke
+        end
+      end
+    end #context can commit
+  end #commit!
 
 end
+
