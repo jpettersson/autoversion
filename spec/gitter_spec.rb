@@ -40,10 +40,41 @@ describe Autoversion::Gitter do
     end
   end
 
+  possible_dirtiness = %w[untracked changed added deleted]
   describe '#dir_is_clean?' do
-    # Disabled for now since ruby-git does not read .gitignore files  
-    it 'returns true' do
-      expect(gitter.dir_is_clean?).to be_true
+    before do
+      # untracked workaround
+      gitter.stub(:gitstatus_untracked_workaround).and_return([])
+
+      possible_dirtiness.each do |dirty|
+        repo.stub_chain(:status, :"#{dirty}").and_return({})
+      end
+    end
+
+    context "when there aren't dirty files" do
+      it 'returns true' do
+        expect(gitter.dir_is_clean?).to be_true
+      end
+    end
+
+    possible_dirtiness.each do |dirty|
+      context "when there are #{dirty} files" do
+        before do
+          # untracked workaround
+          if dirty == 'untracked'
+            gitter.stub(:gitstatus_untracked_workaround).and_return(
+              ["untracked_file.rb"])
+          end
+
+          # e.g.: repo.status.changed => {"changed_file.rb" => nil}
+          repo.stub_chain(:status, :"#{dirty}").and_return(
+            {"#{dirty}_file.rb" => nil})
+        end
+
+        it 'returns false' do
+          expect(gitter.dir_is_clean?).to be_false
+        end
+      end
     end
   end
 
