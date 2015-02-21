@@ -61,11 +61,9 @@ module Autoversion
     end
 
     def gitstatus_untracked_workaround
-      gem_rubygit_buggy_untracked_files = @repo.status.untracked.keys
       git_cmd = "git --work-tree=#{@repo.dir} --git-dir=#{@repo.dir}/.git " +
-                "ls-files -z -d -m -o -X .gitignore"
-      git_files = `#{git_cmd}`.split("\x0")
-      gem_rubygit_buggy_untracked_files & git_files
+                "ls-files -o -z --full-name --exclude-standard"
+      `#{git_cmd}`.split("\x0")
     end
 
   end
