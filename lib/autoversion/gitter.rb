@@ -7,6 +7,9 @@ module Autoversion
     end
     
     class NotOnStableBranch < Exception 
+      def initialize(msg)
+        super(msg)
+      end
     end
 
     def initialize path, config
@@ -21,18 +24,15 @@ module Autoversion
       end
     end
 
+    def ensure_valid_branch! versionType
+      raise NotOnStableBranch.new(@config[:stable_branch]) if versionType == :major && !on_stable_branch?
+    end
+
     def dir_is_clean?
       sum = gitstatus_untracked_workaround.length +
             @repo.status.added.length +
             @repo.status.changed.length +
             @repo.status.deleted.length
-
-      if sum > 0
-        puts "untracked: #{gitstatus_untracked_workaround.join(', ')}"
-        puts "added: #{@repo.status.added.keys.join(', ')}"
-        puts "changed: #{@repo.status.changed.keys.join(', ')}"
-        puts "deleted: #{@repo.status.deleted.keys.join(', ')}"
-      end
 
       sum == 0
     end
@@ -42,9 +42,8 @@ module Autoversion
     end
 
     def commit! versionType, currentVersion
-      return false unless @config[:actions].include?(:commit)
-      raise NotOnStableBranch if versionType == :major && !on_stable_branch?
-
+      return false unless @config[:actions].include?(:commit) 
+   
       write_commit currentVersion
       write_tag currentVersion if @config[:actions].include?(:tag)
     end
