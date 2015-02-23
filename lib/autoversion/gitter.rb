@@ -22,18 +22,19 @@ module Autoversion
     end
 
     def dir_is_clean?
-      # sum = @repo.status.untracked.length + @repo.status.added.length + @repo.status.changed.length + @repo.status.deleted.length
-      # if sum > 0
-      #   puts "untracked: #{@repo.status.untracked}"
-      #   puts "added: #{@repo.status.added}"
-      #   puts "changed: #{@repo.status.changed}"
-      #   puts "deleted: #{@repo.status.deleted}"
-      # end
+      sum = gitstatus_untracked_workaround.length +
+            @repo.status.added.length +
+            @repo.status.changed.length +
+            @repo.status.deleted.length
 
-      # sum == 0
+      if sum > 0
+        puts "untracked: #{gitstatus_untracked_workaround.join(', ')}"
+        puts "added: #{@repo.status.added.keys.join(', ')}"
+        puts "changed: #{@repo.status.changed.keys.join(', ')}"
+        puts "deleted: #{@repo.status.deleted.keys.join(', ')}"
+      end
 
-      # Disabled for now. ruby-git doesn't seem to read the .gitignore files, so the untracked count is completely useless. 
-      true
+      sum == 0
     end
 
     def on_stable_branch?
@@ -59,5 +60,12 @@ module Autoversion
       @repo.add_tag "#{@config[:prefix]}#{version}"
     end
 
+    def gitstatus_untracked_workaround
+      git_cmd = "git --work-tree=#{@repo.dir} --git-dir=#{@repo.dir}/.git " +
+                "ls-files -o -z --full-name --exclude-standard"
+      `#{git_cmd}`.split("\x0")
+    end
+
   end
 end
+
