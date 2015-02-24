@@ -31,6 +31,8 @@ module Autoversion
 
       process_before type, @current, nextVersion
       unless simulate
+        @gitter.ensure_valid_branch! type
+
         write_version @current, nextVersion 
         @current = nextVersion
         @gitter.commit! type, @current.to_s

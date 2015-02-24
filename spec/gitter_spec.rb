@@ -98,7 +98,9 @@ describe Autoversion::Gitter do
 
   describe '#commit!' do
     let(:version) { 'v1.2.3' }
-    let(:invoke) { gitter.commit! :major, version }
+    let(:invoke) { 
+      gitter.commit! :major, version 
+    }
 
     context 'when cannot commit' do
       context 'when config actions do not include "commit"' do
@@ -117,7 +119,10 @@ describe Autoversion::Gitter do
         include_context 'when on "whatever" branch'
 
         it 'raises NotOnStableBranch Exception' do
-          expect { invoke }.to(
+          expect { 
+              gitter.ensure_valid_branch! :major
+              invoke 
+            }.to(
             raise_error ::Autoversion::Gitter::NotOnStableBranch)
         end
       end

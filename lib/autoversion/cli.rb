@@ -51,8 +51,15 @@ module Autoversion
       def increment_version type, simulate=false, force=false
         if force or yes? "Do you want to increment #{type.to_s} to #{@versioner.next_version(type)}? (y/N)"
           outcome = simulate ? "would change" : "changed"
-          @versioner.increment! type, simulate
-          say "Version #{outcome} to #{@versioner.current_version}", simulate ? :cyan : :green
+
+          begin
+            @versioner.increment! type, simulate
+            say "Version #{outcome} to #{@versioner.current_version}", simulate ? :cyan : :green
+          rescue Autoversion::Gitter::DirtyStaging
+            say "Autoversion error: The git workspace is in a dirty state.", :red
+          rescue Autoversion::Gitter::NotOnStableBranch => e
+            say "Autoversion error: Major version increments can only happen on your configured stable branch (#{e.message}).", :red
+          end
         else
           say "No changes were made."
         end
