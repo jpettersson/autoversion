@@ -14,19 +14,3 @@ write_version do |currentVersion, nextVersion|
     file.write contents
   end
 end
-
-before :version do |currentVersion, nextVersion|
-  puts "Before version #{currentVersion} => #{nextVersion}"
-end
-
-after :version do |currentVersion|
-  puts "After version #{currentVersion}"
-end
-
-before :patch do |currentVersion, nextVersion|
-  puts "Before patch #{currentVersion} => #{nextVersion}"
-end
-
-after :patch do |currentVersion|
-  puts "After patch #{currentVersion}"
-end
