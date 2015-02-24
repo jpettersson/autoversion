@@ -3,7 +3,22 @@ require 'spec_helper'
 describe Autoversion::Versioner do
 
   before(:each) do
-    @versioner = Autoversion::Versioner.new Versionfiles::VALID_BASIC
+    @path = File.join(File.dirname(__FILE__), 'tmp', 'versioner')
+    
+    if File.directory? @path
+      FileUtils.rm_rf @path
+    end
+
+    system("mkdir #{@path}")
+    system("tar -xf spec/fixtures/bare_repo.tar --strip 1 -C #{@path}")
+
+    system("echo '0.0.1' > #{@path}/version.txt")
+    system("cd #{@path} && git add .")
+    system("cd #{@path} && git commit -m 'first'")
+    
+    @repo = Git.open(@path)
+
+    @versioner = Autoversion::Versioner.new Versionfiles::VALID_BASIC, @path
   end
 
   it "should be able to read the current version" do

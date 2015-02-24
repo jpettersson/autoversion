@@ -9,5 +9,6 @@ RSpec.configure do |config|
   config.after(:all) do
     FileUtils.rm_rf File.join(File.dirname(__FILE__), 'tmp', 'gitter')
     FileUtils.rm_rf File.join(File.dirname(__FILE__), 'tmp', 'cli')
+    FileUtils.rm_rf File.join(File.dirname(__FILE__), 'tmp', 'versioner')
   end
 end
