@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    autoversion (0.5.2)
+    autoversion (0.5.3)
       git (= 1.2.5)
       semantic (= 1.1.0)
       thor (= 0.17.0)
