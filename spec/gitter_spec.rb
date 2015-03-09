@@ -16,13 +16,13 @@ describe Autoversion::Gitter do
       :stable_branch => stable_branch})
   end
 
-  shared_context 'when on "whatever" branch' do
+  shared_context 'on "whatever" branch' do
     before do
       repo.stub(:current_branch).and_return('whatever')
     end
   end
 
-  shared_context 'when on stable branch' do
+  shared_context 'on stable branch' do
     before do
       repo.stub(:current_branch).and_return(stable_branch)
     end
@@ -37,6 +37,38 @@ describe Autoversion::Gitter do
         expect { gitter.ensure_cleanliness! }.to(
           raise_error ::Autoversion::Gitter::DirtyStaging)
       end
+    end
+  end
+
+  describe 'ensure_valid_branch!' do
+    let(:invoke) { gitter.ensure_valid_branch!(version_type) }
+    include_context 'on "whatever" branch'
+
+    shared_examples 'it does not raise any exception' do
+      it 'does not raise any exception' do
+        expect { invoke }.not_to(raise_error)
+      end
+    end
+
+    context 'when version_type == :major' do
+      let(:version_type) { :major }
+
+      context 'when on "whatever" branch' do
+        it 'raises NotOnStableBranch Exception' do
+          expect { invoke }.to(
+            raise_error ::Autoversion::Gitter::NotOnStableBranch)
+        end
+      end
+
+      context 'when on stable blranch' do
+        include_context 'on stable branch'
+        it_behaves_like 'it does not raise any exception'
+      end
+    end
+
+    context 'when version_type != :major' do
+      let(:version_type) { :minor }
+      it_behaves_like 'it does not raise any exception'
     end
   end
 
@@ -80,7 +112,7 @@ describe Autoversion::Gitter do
 
   describe '#on_stable_branch?' do
     context 'when the config stable branch differs with the current branch' do
-      include_context 'when on "whatever" branch'
+      include_context 'on "whatever" branch'
 
       it 'returns false' do
         expect(gitter.on_stable_branch?).to be_false
@@ -88,7 +120,7 @@ describe Autoversion::Gitter do
     end
 
     context 'when the config stable branch equals the current branch' do
-      include_context 'when on stable branch'
+      include_context 'on stable branch'
 
       it 'returns true' do
         expect(gitter.on_stable_branch?).to be_true
@@ -98,9 +130,7 @@ describe Autoversion::Gitter do
 
   describe '#commit!' do
     let(:version) { 'v1.2.3' }
-    let(:invoke) { 
-      gitter.commit! :major, version 
-    }
+    let(:invoke) { gitter.commit! :major, version }
 
     context 'when cannot commit' do
       context 'when config actions do not include "commit"' do
@@ -114,22 +144,10 @@ describe Autoversion::Gitter do
           expect(invoke).to be_false
         end
       end
-
-      context 'when versionType == :major && #on_stable_branch? == false' do
-        include_context 'when on "whatever" branch'
-
-        it 'raises NotOnStableBranch Exception' do
-          expect { 
-              gitter.ensure_valid_branch! :major
-              invoke 
-            }.to(
-            raise_error ::Autoversion::Gitter::NotOnStableBranch)
-        end
-      end
     end #context cannot commit
 
     context 'when can commit' do
-      include_context 'when on stable branch'
+      include_context 'on stable branch'
 
       before do
         repo.should_receive(:add).with('.').ordered
