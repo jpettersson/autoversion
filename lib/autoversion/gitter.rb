@@ -24,8 +24,10 @@ module Autoversion
       end
     end
 
-    def ensure_valid_branch! versionType
-      raise NotOnStableBranch.new(@config[:stable_branch]) if versionType == :major && !on_stable_branch?
+    def ensure_valid_branch! version_type
+      if version_type == :major && !on_stable_branch?
+        raise NotOnStableBranch.new(@config[:stable_branch])
+      end
     end
 
     def dir_is_clean?
@@ -41,11 +43,11 @@ module Autoversion
       @repo.current_branch == @config[:stable_branch].to_s
     end
 
-    def commit! versionType, currentVersion
+    def commit! version_type, current_version
       return false unless @config[:actions].include?(:commit) 
    
-      write_commit currentVersion
-      write_tag currentVersion if @config[:actions].include?(:tag)
+      write_commit current_version
+      write_tag current_version if @config[:actions].include?(:tag)
     end
 
     private
